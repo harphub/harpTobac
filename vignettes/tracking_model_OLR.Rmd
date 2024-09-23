@@ -1,0 +1,19 @@
+---
+title: "tracking_model_OLR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{tracking_model_OLR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(harpTobac)
+```
