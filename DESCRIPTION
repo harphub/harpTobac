@@ -27,5 +27,5 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://github.com/harphub/harpTobac
+URL: https://github.com/harphub/harpTobac, https://harphub.github.io/harpTobac/
 BugReports: https://github.com/harphub/harpTobac/issues

@@ -38,7 +38,7 @@ install_tobac <- function(
     )
   )
 
-  reticulate::py_install("Numba", "harp-tobac")
+  reticulate::py_install("Numba", envname)
 
 }
 
