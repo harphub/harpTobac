@@ -1,0 +1,25 @@
+Package: harpTobac
+Type: Package
+Title: harp bindings for the Python tobac package
+Version: 0.1.0
+Authors@R: as.person(c(
+    "Andrew Singleton <andrewts@met.no> [aut, cre]",
+    "Juan-Jesus Gonzalez <jgonzaleza@aemet.es> [aut]"
+  ))
+Description: Bindings to tobac functions for feature detection, segementation
+  and tracking. 
+License: Apache License (>= 2)
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    cli,
+    glue,
+    harpCore (>= 0.2.2.9006),
+    reticulate,
+    rlang,
+    tibble,
+    zeallot
+Remotes:
+    harphub/harpCore
+RoxygenNote: 7.3.1
+Roxygen: list(markdown = TRUE)
