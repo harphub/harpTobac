@@ -21,7 +21,7 @@ radiation field from the NWP model MEPS. We are going to make use of the
 _harpIO_ package to load the data and the _ggplot2_ package, together with some
 expansions from the _harpVis_ package to plot the data.  
 
-```{r setup, results='hide'}
+```{r setup, results='hide', message=FALSE}
 library(harpIO)
 library(harpVis)
 library(harpTobac)
