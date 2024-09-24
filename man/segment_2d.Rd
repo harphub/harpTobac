@@ -9,7 +9,7 @@ segment_2d(
   field_data,
   threshold,
   data_col = "gridded_data",
-  time_col = "valid_dttm",
+  dttm_col = "valid_dttm",
   target = c("max", "min"),
   level = NULL,
   method = "watershed",
@@ -35,6 +35,13 @@ mask.}
 \code{field_data} containing the fields to be used to detect features in. Should
 be a \verb{<geolist>} column. If the named column is not found in \code{field_data},
 but \code{field_data} contains 1 \verb{<geolist>} column, that \verb{<geolist>} column is
+used.}
+
+\item{dttm_col}{<\code{\link[=dplyr_tidy_select]{tidy-select}}> The column in
+\code{field_data} containing the date-times to be used for the time dimension.
+Can be numeric with units in Unix time (seconds since 1970-01-01 00:00:00),
+or a \verb{<POSIXt>}column. If the named column is not found in \code{field_data},
+but \code{field_data} contains 1 \verb{<POSIXt>} column, that \verb{<POSIXt>} column is
 used.}
 
 \item{target}{Flag to determine if tracking is targeting minima or maxima in

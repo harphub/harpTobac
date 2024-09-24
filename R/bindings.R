@@ -81,7 +81,7 @@ detect_features_multithreshold <- function(
   field_data,
   thresholds,
   data_col           = "gridded_data",
-  time_col           = "valid_dttm",
+  dttm_col           = "valid_dttm",
   target             = c("max", "min"),
   position_threshold = c(
     "centre",
@@ -231,7 +231,7 @@ segment_2d <- function(
   field_data,
   threshold,
   data_col     = "gridded_data",
-  time_col     = "valid_dttm",
+  dttm_col     = "valid_dttm",
   target       = c("max", "min"),
   level        = NULL,
   method       = "watershed",
@@ -242,7 +242,7 @@ segment_2d <- function(
 ) {
 
   data_col <- rlang::enquo(data_col)
-  time_col <- rlang::enquo(time_col)
+  time_col <- rlang::enquo(dttm_col)
 
   data_col_name <- rlang::as_name(data_col)
   time_col_name <- rlang::as_name(time_col)
@@ -375,7 +375,7 @@ link_tracks <- function(
   field_data,
   dz                     = NULL,
   data_col               = "gridded_data",
-  time_col               = "valid_dttm",
+  dttm_col               = "valid_dttm",
   d_max                  = NULL,
   subnetwork_size        = NULL,
   v_max                  = NULL,
@@ -398,7 +398,7 @@ link_tracks <- function(
 ) {
 
   data_col <- rlang::enquo(data_col)
-  time_col <- rlang::enquo(time_col)
+  time_col <- rlang::enquo(dttm_col)
 
   data_col_name <- rlang::as_name(data_col)
   time_col_name <- rlang::as_name(time_col)
