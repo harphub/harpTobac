@@ -27,6 +27,12 @@ library(harpVis)
 library(harpTobac)
 ```
 
+```{r echo=FALSE}
+if (!reticulate::virtualenv_exists("harp-py")) {
+  install_tobac()
+}
+```
+
 # Loading the data
 
 First we need to load the data using `read_forecast()` from the _harpIO_ 
