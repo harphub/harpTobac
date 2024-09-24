@@ -33,10 +33,5 @@ Suggests:
     ggplot2,
     ncdf4
 VignetteBuilder: knitr
-Config/Needs/website:           
-    ggplot2,
-    ncdf4,
-    harpIO,
-    haprVis
 URL: https://github.com/harphub/harpTobac, https://harphub.github.io/harpTobac/
 BugReports: https://github.com/harphub/harpTobac/issues
