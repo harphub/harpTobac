@@ -20,7 +20,7 @@ Imports:
     tibble,
     zeallot
 Remotes:
-    harphub/harpCore
+    harphub/harpCore@develop
 RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
 Suggests: 
