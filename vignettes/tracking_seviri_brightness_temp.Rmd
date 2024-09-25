@@ -223,7 +223,7 @@ ggplot(filter(tracks, cell > -1), aes(x, y)) +
     aes(group = factor(cell), colour = factor(threshold_value)),
     arrow = arrow(type = "open", angle = 30, length = unit(0.1, "cm"))
   ) +
-  facet_wrap(~paste0("Brightness temp >= ", threshold_value, "K")) +
+  facet_wrap(~paste0("Brightness temp <= ", threshold_value, "K")) +
   labs(colour = bquote(atop(Brightness~Temp, Threshold~"["*K*"]"))) +
   coord_equal(expand = FALSE) + 
   theme_harp_map()
