@@ -93,7 +93,7 @@ ggplot() +
     upscale_factor = 8, upscale_method = "downsample"
   ) + 
   geom_path(aes(x, y), countries, colour = "grey30") +
-  facet_wrap(~valid_dttm) +
+  facet_wrap(~format(valid_dttm, "%H:%M")) +
   scale_fill_viridis_c(bquote(OLR~"["*W.m^{-2}*"]"), direction = -1) + 
   coord_equal(expand = FALSE) +
   theme_harp_map()
@@ -111,7 +111,7 @@ ggplot() +
     upscale_factor = 8, upscale_method = "downsample"
   ) + 
   geom_path(aes(x, y), countries, colour = "grey30") +
-  facet_wrap(~valid_dttm) +
+  facet_wrap(~format(valid_dttm, "%H:%M")) +
   scale_fill_viridis_c(
     bquote(OLR~"["*W.m^{-2}*"]"), direction = -1, 
     limits = c(NA, 180), na.value = "white"
@@ -145,7 +145,7 @@ We can now plot the feature locations for each threshold and time.
 ggplot(features, aes(projection_x_coordinate, projection_y_coordinate)) +
   geom_path(aes(x, y), countries, colour = "grey30") + 
   geom_point(aes(colour = factor(threshold_value))) +
-  facet_wrap(~timestr) +
+  facet_wrap(~format(as.POSIXct(timestr, tz = "UTC"), "%H:%M")) +
   coord_equal(expand = FALSE) + 
   theme_harp_map() + 
   labs(colour = bquote(atop(OLR~Threshold,"["*W.m^{-2}*"]")))

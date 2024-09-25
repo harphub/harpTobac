@@ -156,7 +156,7 @@ countries <- get_map(get_domain(bt$brightness_temp), polygon = FALSE)
 ggplot(features, aes(longitude, latitude)) +
   geom_path(aes(x, y), countries, colour = "grey30") + 
   geom_point(aes(colour = factor(threshold_value))) +
-  facet_wrap(~timestr) +
+  facet_wrap(~format(as.POSIXct(timestr, tz = "UTC"), "%H:%M")) +
   coord_equal(expand = FALSE) + 
   theme_harp_map() + 
   labs(colour = bquote(atop(Brightness~Temp, Threshold~"["*K*"]")))
