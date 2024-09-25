@@ -191,7 +191,7 @@ ggplot() +
   ) + 
   geom_path(aes(x, y), countries, colour = "grey30") +
   facet_wrap(~valid_dttm) +
-  scale_fill_viridis_c(direction = -1) +
+  scale_fill_viridis_c("Brightness\nTemp [K]", direction = -1) +
   coord_equal(expand = FALSE) +
   theme_harp_map()
 ```
