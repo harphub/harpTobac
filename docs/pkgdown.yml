@@ -1,0 +1,8 @@
+pandoc: 3.1.1
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  tracking_model_OLR: tracking_model_OLR.html
+  tracking_seviri_brightness_temp: tracking_seviri_brightness_temp.html
+last_built: 2024-09-25T12:10Z
+
