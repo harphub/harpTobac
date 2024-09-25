@@ -1,0 +1,231 @@
+---
+title: "Track satellite brightness temperature"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Track satellite brightness temperature}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+The purpose of this article is to show how to read in data that harp cannot
+natively deal with. In this case we will read in SEVIRI brightness temperature 
+data from a NetCDF file that lacks information about the domain. 
+
+```{r setup, results='hide', message=FALSE}
+library(harpTobac)
+library(harpCore)
+library(harpVis)
+library(ncdf4)
+```
+
+# Attach the data file and define the domain
+
+The data are stored as example data with the _harpTobac_ package and can be 
+accessed via the `system.file()` function. 
+
+```{r attach-nc}
+file_name <- system.file(
+  "example_data/Spain_202205_SEVIRI_bt_all.nc",
+  package = "harpTobac"
+)
+nc <- nc_open(file_name)
+```
+
+Longitude and latitude are stored as 2d arrays, so let's read them in and then 
+close the connection to the NetCDF file.
+
+```{r read-lon-lat}
+lon <- ncvar_get(nc, "longitude")
+lat <- ncvar_get(nc, "latitude")
+nc_close(nc)
+```
+
+
+Now we need to establish the grid resolution. We can establish if the data are
+on a regular grid, by checking if the mean difference between each value is the 
+same as the maximum. 
+
+```{r check-for-regular-grid}
+identical(apply(diff(lon), 1, mean), apply(diff(lon), 1, max))
+identical(apply(diff(t(lat)), 1, mean), apply(diff(t(lat)), 1, max))
+```
+
+Now that we have established that the data are on a regular grid, we can 
+extract the horizontal resolution. 
+
+```{r get-dx-dy}
+dx <- diff(lon)[1]
+dy <- diff(t(lat))[1]
+```
+
+Finally we need the centre point of the domain in order to properly define 
+the domain.
+
+```{r domain-centre}
+centre_lon <- min(lon) + diff(range(lon)) / 2
+centre_lat <- min(lat) + diff(range(lat)) / 2
+```
+
+Now we can define the domain.
+
+```{r define-domain, fig.width=8, fig.height=8, fig.align='center'}
+dom <- define_domain(
+  centre_lon = centre_lon, 
+  centre_lat = centre_lat,
+  nxny       = dim(lon),
+  dxdy       = c(dx, dy),
+  proj       = "longlat"
+)
+
+plot(dom)
+```
+
+We also need to get the time data from the file. These are stored in hours 
+since the first date-time, but we want the data to be the actual date times. 
+_harpIO_ has a, currently non exported function, that can read the time data 
+and convert them in date-times in UTC. 
+
+```{r read-date-times}
+valid_dttm <- unixtime_to_dttm(
+  harpIO:::get_time_nc(file_name, harpIO::netcdf_opts())$validdate
+)
+```
+
+# Read the brightness temperature data
+
+The brightness temperature is stored in degrees C, which we will convert to 
+Kelvin. We will read in one time at a time and use the domain e have just 
+defined to put the data into a geofield, and subsequently a geolist. We will 
+do this with the help of `lapply()` and put the data in a tibble (just a 
+data frame with a nicer print method). 
+
+```{r read-brightness-temp}
+library(tibble)
+nc <- nc_open(file_name)
+bt <- tibble(
+  valid_dttm = valid_dttm,
+  brightness_temp = geolist(
+    lapply(
+      seq_along(valid_dttm),
+      function(i) geofield(
+        ncvar_get(nc, "bt", start = c(1, 1, i), count = c(-1, -1, 1)) + 273.15,
+        domain = dom
+      )
+    )
+  )
+)
+nc_close(nc)
+```
+
+Finally the _harpTobac_ functions require the data to be of class `harp_df` and 
+we can easily do that conversion with `as_harp_df()`
+
+```{r to-harp-df}
+bt <- as_harp_df(bt)
+```
+
+# Feature detection
+
+We will detect features using minimum brightness temperature thresholds of 250, 
+240, 230 and 220 K.
+
+```{r detect-features, results='hide'}
+features <- detect_features_multithreshold(
+  bt, 
+  thresholds         = seq(250, 220, -10),
+  data_col           = brightness_temp,
+  target             = "min",
+  n_min_threshold    = 16, 
+  position_threshold = "weighted_diff"
+)
+```
+
+And plot the feature locations at each time.
+
+```{r plot-features, fig.width=8, fig.height=8, fig.align='center'}
+countries <- get_map(get_domain(bt$brightness_temp), polygon = FALSE)
+ggplot(features, aes(longitude, latitude)) +
+  geom_path(aes(x, y), countries, colour = "grey30") + 
+  geom_point(aes(colour = factor(threshold_value))) +
+  facet_wrap(~timestr) +
+  coord_equal(expand = FALSE) + 
+  theme_harp_map() + 
+  labs(colour = bquote(atop(Brightness~Temp, Threshold~"["*K*"]")))
+```
+
+# Segmentation
+
+We will segment the data using a threshold of 250K.
+
+```{r segmentation, results='hide'}
+library(zeallot)
+c(segments, features) %<-% segment_2d(
+  features, 
+  bt, 
+  threshold = 250, 
+  data_col  = brightness_temp, 
+  target    = "min"
+)
+```
+ 
+And plot with the brightness temperature for some selected times.
+
+```{r plot-segments, fig.width=8, fig.height=8, fig.align='center'}
+ggplot() + 
+  geom_georaster(
+    aes(geofield = brightness_temp), bt[13:16, ], 
+    upscale_factor = 4, upscale_method = "downsample"
+  ) +
+  geom_geocontour(
+    aes(geofield = segmentation_mask), segments[13:16, ],
+    colour = "red"
+  ) + 
+  geom_path(aes(x, y), countries, colour = "grey30") +
+  facet_wrap(~valid_dttm) +
+  scale_fill_viridis_c(direction = -1) +
+  coord_equal(expand = FALSE) +
+  theme_harp_map()
+```
+
+# Cell tracks
+
+Now we can compute the cell tracks. 
+
+```{r compute-tracks, results='hide'}
+tracks <- link_tracks(
+  features, 
+  bt, 
+  data_col        = brightness_temp, 
+  v_max           = 20, 
+  stubs           = 2,  
+  subnetwork_size = 100, 
+  adaptive_step   = 0.95, 
+  adaptive_stop   = 0.2
+)
+```
+
+And plot them, separately for each feature threshold.
+
+```{r plot-tracks, fig.width=8, fig.height=8, fig.align='center'}
+countries <- get_map(get_domain(bt$brightness_temp))
+ggplot(filter(tracks, cell > -1), aes(x, y)) + 
+  geom_polygon(aes(group = group), countries, fill = "grey", colour = "grey30") +
+  geom_path(
+    aes(group = factor(cell), colour = factor(threshold_value)),
+    arrow = arrow(type = "open", angle = 30, length = unit(0.1, "cm"))
+  ) +
+  facet_wrap(~paste0("Brightness temp >= ", threshold_value, "K")) +
+  labs(colour = bquote(atop(OLR~threshold, "["*W.m^{-2}*"]"))) +
+  coord_equal(expand = FALSE) + 
+  theme_harp_map()
+```
+

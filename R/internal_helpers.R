@@ -55,16 +55,31 @@ geolist_to_iris_cube <- function(geo, valid_dttm) {
   x       <- seq(dom_ext$x0, dom_ext$x1, dom_ext$dx)
   y       <- seq(dom_ext$y0, dom_ext$y1, dom_ext$dy)
 
+  ll_proj <- c(
+    "lalo","longlat", "latlong", "rot_longlat", "rot_latlong", "RotLatLon"
+  )
+  if (dom$projection$proj %in% ll_proj) {
+    x_name  <- "longitude"
+    y_name  <- "latitude"
+    x_units <- "degrees_east"
+    y_units <- "degrees_north"
+  } else {
+    x_name  <- "projection_x_coordinate"
+    y_name  <- "projection_y_coordinate"
+    x_units <- "m"
+    y_units <- "m"
+  }
+
   x_dims <- DimCoord(
     reticulate::np_array(x),
-    standard_name = "projection_x_coordinate",
-    units         = "m"
+    standard_name = x_name,
+    units         = x_units
   )
 
   y_dims <- DimCoord(
     reticulate::np_array(y),
-    standard_name = "projection_y_coordinate",
-    units         = "m"
+    standard_name = y_name,
+    units         = y_units
   )
 
   time_dims <- DimCoord(

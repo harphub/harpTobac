@@ -467,8 +467,8 @@ link_tracks <- function(
 
   colnames(tracks) <- suppressWarnings(harpCore::psub(
     colnames(tracks),
-    c("^projection_", "_coordinate$"),
-    c("", ""),
+    c("^projection_", "_coordinate$", "^longitude$", "^latitude$"),
+    c("", "", "x", "y"),
     exact = FALSE
   ))
 
