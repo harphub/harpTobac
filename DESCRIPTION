@@ -14,7 +14,7 @@ LazyData: true
 Imports: 
     cli,
     glue,
-    harpCore (>= 0.2.2.9006),
+    harpCore (>= 0.2.2.9007),
     reticulate,
     rlang,
     tibble,

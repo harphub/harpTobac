@@ -1,16 +1,29 @@
-get_grid_spacing <- function(lon, lat) {
-  lon_range <- range(lon)
-  lat_range <- range(lat)
+get_grid_spacing <- function(dom) {
+  ll_proj <- c(
+    "lalo","longlat", "latlong", "rot_longlat", "rot_latlong", "RotLatLon"
+  )
+  if (!dom$projection$proj %in% ll_proj) {
+    return(dom$dx)
+  }
 
-  centre_lon <- min(lon) + diff(lon_range) / 2
-  centre_lat <- min(lat) + diff(lat_range) / 2
+  estimate_grid_spacing_from_ll(dom)
+}
 
-  west_east   <- haversine(lon_range[1], lon_range[2], centre_lat, centre_lat) /
-    (nrow(lon) - 1)
-  south_north <- haversine(centre_lon, centre_lon, lat_range[1], lat_range[2]) /
-    (ncol(lat) - 1)
 
-  c(west_east, south_north)
+# get the grid spacing at the centre of the domain
+estimate_grid_spacing_from_ll <- function(dom) {
+  dom_ext <- harpCore::domain_extent(dom)
+
+  centre_lon <- dom_ext$clonlat[1]
+  centre_lat <- dom_ext$clonlat[2]
+
+  lon_range <- c(centre_lon - dom_ext$dx / 2, centre_lon + dom_ext$dx / 2)
+  lat_range <- c(centre_lat - dom_ext$dy / 2, centre_lat + dom_ext$dy / 2)
+
+  dx <- haversine(lon_range[1], lon_range[2], centre_lat, centre_lat)
+  dy <- haversine(centre_lon, centre_lon, lat_range[1], lat_range[2])
+
+  mean(c(dx, dy))
 }
 
 haversine <- function(lon1, lon2, lat1, lat2) {

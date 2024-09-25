@@ -157,7 +157,7 @@ detect_features_multithreshold <- function(
     ))
   }
 
-  dx <- harpCore::get_domain(field_data[[data_col_name]])$dx
+  dx <- get_grid_spacing(harpCore::get_domain(field_data[[data_col_name]]))
 
   res <- reticulate::py_to_r(reticulate::py_suppress_warnings(
     tobac$feature_detection_multithreshold(
@@ -262,7 +262,7 @@ segment_2d <- function(
 
   seed_3d_flag <- match.arg(seed_3d_flag)
 
-  dx <- harpCore::get_domain(field_data[[data_col_name]])$dx
+  dx <- get_grid_spacing(harpCore::get_domain(field_data[[data_col_name]]))
 
   segmentation <- reticulate::py_to_r(tobac$segmentation_2D(
     features,
@@ -422,7 +422,7 @@ link_tracks <- function(
   min_h2                 <- as_int(min_h2)
   max_h2                 <- as_int(max_h2)
 
-  dx <- harpCore::get_domain(field_data[[data_col_name]])$dx
+  dx <- get_grid_spacing(harpCore::get_domain(field_data[[data_col_name]]))
 
   tracks <- tobac$linking_trackpy(
     features,
